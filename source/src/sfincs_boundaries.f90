@@ -760,8 +760,6 @@ contains
    ! Set water level in all boundary points on grid
    ! This loop is all done on the CPU
    !
-   !$omp parallel private ( ib, nmb, zst, zsetup, zig, smfac, zs0act, ibdr, zs0smooth ) if(ngbnd > 10000)
-   !$omp do schedule(dynamic, 64)
    do ib = 1, ngbnd
       !
       nmb = nmindbnd(ib)
@@ -891,8 +889,6 @@ contains
       endif
       !
    enddo
-   !$omp end do
-   !$omp end parallel
    !
    end subroutine
 
@@ -912,7 +908,7 @@ contains
    !
    real*4 ui, ub, dzuv, facint, zsuv, depthuv
    !
-   !$acc update device( zsb0, zsb )
+   !$omp target update to (zsb0, zsb)
    !
    factime = min(dt / btfilter, 1.0)
    one_minus_factime = 1.0 - factime
@@ -920,12 +916,7 @@ contains
    !
    ! UV fluxes at boundaries
    !
-   !$acc parallel present( index_kcuv2, nmikcuv2, nmbkcuv2, ibkcuv2, kcuv, zs, z_volume, q, uvmean, uv, zb, zbuv, zsb, zsb0, &
-   !$acc                  subgrid_uv_zmin, subgrid_uv_zmax, subgrid_uv_havg, subgrid_uv_havg_zmax, subgrid_z_zmin, ibuvdir, zsmax, kcs ) vector_length(32)
-   !$acc loop independent gang vector
-   !$omp parallel private ( ib, indb, nmb, nmi, ip, zsnmi, zsnmb, zs0nmb, zsuv, depthuv, dzuv, iuv, facint, hnmb, ui, ub ) if(nkcuv2 > 10000)
-   !$omp do schedule(dynamic, 64)
-   do ib = 1, nkcuv2
+   do concurrent (ib = 1: nkcuv2) local(indb, nmb, nmi, ip, zsnmi, zsnmb, zs0nmb, zsuv, depthuv, dzuv, iuv, facint, hnmb, ui, ub)
       !
       indb   = ibkcuv2(ib)
       !
@@ -1091,9 +1082,6 @@ contains
       endif
       !
    enddo
-   !$omp end do
-   !$omp end parallel
-   !$acc end parallel
    !
    end subroutine
 

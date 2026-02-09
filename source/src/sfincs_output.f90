@@ -113,16 +113,19 @@ module sfincs_output
    if (write_map .or. write_his .or. write_rst) then
       !
       !$acc update host(zs)
+      !$omp target update from (zs)
       !
       if (store_cumulative_precipitation) then
          !      
          !$acc update host(prcp)
+         !$omp target update from (prcp)
          !
       endif   
       !
       if (store_velocity) then
          !      
          !$acc update host(uv)
+         !$omp target update from (uv)
          !
       endif   
       !
@@ -130,6 +133,7 @@ module sfincs_output
          !
          !$acc update host(q)
          !$acc update host(uvmean)
+         !$omp target update from (q , uvmean)
          !
       endif
       !
@@ -138,6 +142,7 @@ module sfincs_output
          !$acc update host(windu)
          !$acc update host(windv)
          !$acc update host(patm)
+         !$omp target update from (windu,windv,patm)
          !
       endif
       !      
@@ -166,28 +171,35 @@ module sfincs_output
    if (write_max .and. dtmaxout > 0.0) then
       !
       !$acc update host(zsmax)
+      !$omp target update from (zsmax)
       !
       if (store_maximum_velocity) then
          !$acc update host(vmax)
+         !$omp target update from (vmax)
       endif
       !
       if (store_maximum_flux) then
          !$acc update host(qmax)
+         !$omp target update from (qmax)
       endif      
       !      
       if (store_twet) then
          !$acc update host(twet)
+         !$omp target update from (twet)
       endif
       if (store_t_zsmax) then
          !$acc update host(t_zsmax)
+         !$omp target update from (t_zsmax)
       endif
       !
       if (store_cumulative_precipitation) then
          !$acc update host(cumprcp)
+         !$omp target update from (cumprcp)
       endif
       !
       if (precip .and. scsfile(1:4) /= 'none') then !!! also include other infiltration 
          !$acc update host(cuminf)
+         !$omp target update from (cuminf)
       endif
       !
       if (outputtype_map == 'net') then
@@ -207,16 +219,19 @@ module sfincs_output
       if (store_maximum_waterlevel) then
          zsmax = -999.0 ! Set zsmax back to a small value
          !$acc update device(zsmax)
+         !$omp target update from (zsmax)
       endif
       !
       if (store_maximum_velocity) then
          vmax = -999.0 ! Set vmax back to a small value
          !$acc update device(vmax)
+         !$omp target update from (vmax)
       endif
       !
       if (store_maximum_flux) then
          qmax = -999.0 ! Set qmax back to a small value
          !$acc update device(qmax)
+         !$omp target update from (qmax)
       endif      
       !      
 !      if (precip .and. store_cumulative_precipitation) then
@@ -227,11 +242,13 @@ module sfincs_output
       if (store_twet) then
          twet = 0.0 ! Set twet back to 0.0
          !$acc update device(twet)
+         !$omp target update from (twet)
       endif
       !      
       if (store_t_zsmax) then
          t_zsmax = -999.0 ! Set t_zsmax back to a small value
          !$acc update device(t_zsmax)
+         !$omp target update from (t_zsmax)
       endif
    endif
    !
@@ -643,6 +660,7 @@ module sfincs_output
    if (nrcrosssections>0) then
       !
       !$acc update host(q)
+      !$omp target update from (q)
       !      
       ! Determine fluxes through cross sections
       !
@@ -656,6 +674,7 @@ module sfincs_output
    !
    if (ndrn>0 .and. store_qdrain) then
       !$acc update host(qtsrc)
+      !$omp target update from (qtsrc)
       open(unit = 970, file = trim('qdrain.txt'), access='append')
       write(970,'(f12.1,10000f9.3)')t,(qtsrc(iobs), iobs = nsrc + 1, nsrcdrn, 2)
       close(970)

@@ -448,9 +448,6 @@ contains
    !
    AB = 0.0
    !
-   !$omp parallel &
-   !$omp private ( nm, irow )
-   !$omp do schedule ( dynamic, 256 )
    do irow = 1, nrows
       !
       nm = nm_index_of_row(irow)
@@ -458,12 +455,7 @@ contains
       Dnm(irow)  = max(zs(nm) - zb(nm), huthresh_nh)
       !
    enddo
-   !$omp end do
-   !$omp end parallel
-   !   
-   !$omp parallel &
-   !$omp private ( ip, ipuv, nm, nmu, num, hnm, hnmu, Dnm1, Dnmu )
-   !$omp do schedule ( dynamic, 256 )
+   !
    do ip = 1, nhuv
       !
       ! Get water levels of neighboring cells
@@ -490,8 +482,6 @@ contains
       endif   
       !
    enddo
-   !$omp end do
-   !$omp end parallel
    !
    ! Compute non-hydrostatic pressure by solving matrix AA * PP = QQ, where AA is a sparse matrix, PP is the nonh pressure, and QQ is the forcing
    !
@@ -502,9 +492,6 @@ contains
    !
    ! Fill sparse matrix
    !
-   !$omp parallel &
-   !$omp private ( ip, nm, j, nmd, nmu, ndm, num )
-   !$omp do schedule ( dynamic, 256 )
    do irow = 1, nrows
       !
       ! Indices in nh uv array of neighboring uv points
@@ -623,8 +610,6 @@ contains
       ! endif
       !
    enddo
-   !$omp end do
-   !$omp end parallel
    !
    ! Solve matrix
    !
@@ -634,9 +619,6 @@ contains
    !
    dtover2rhodx = (dt * dxrinv(1) / (2 * rhow))
    !
-   !$omp parallel &
-   !$omp private ( ip, ipuv, nm, nmu, nhnm, nhnmu, hu, unh )
-   !$omp do schedule ( dynamic, 256 )
    do ip = 1, nhuv
       !
       ipuv = uv_index_of_nhuv(ip)
@@ -668,15 +650,10 @@ contains
          !
       endif
       !
-   enddo   
-   !$omp end do
-   !$omp end parallel   
+   enddo    
    !
    ! Update vertical velocity ws and wb
    !
-   !$omp parallel &
-   !$omp private ( nm, iuv, irow, nmn, hnm, hnb)
-   !$omp do schedule ( dynamic, 256 )
    do irow = 1, nrows
       !
       ! Copy wb0 from previous time step
@@ -735,8 +712,6 @@ contains
       ws(irow) = ws(irow) - (wb(irow) - wb0(irow)) + (2 * dt / (rhow * Dnm(irow))) * pnh(irow) ! this is ws m+1 in the next time step
       !
    enddo   
-   !$omp end do
-   !$omp end parallel
    !
    call system_clock(count1, count_rate, count_max)
    tloop = tloop + 1.0*(count1 - count0)/count_rate

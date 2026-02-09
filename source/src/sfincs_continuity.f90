@@ -75,18 +75,11 @@ contains
       !
    endif
    !
-   !$acc parallel present( kcs, zs, zb, netprcp, prcp, q, qext, zsmax, zsm, maxzsm, &
-   !$acc                   z_flags_iref, uv_flags_iref, &
-   !$acc                   z_index_uv_md, z_index_uv_nd, z_index_uv_mu, z_index_uv_nu, &
-   !$acc                   dxm, dxrm, dyrm, dxminv, dxrinv, dyrinv, cell_area_m2, cell_area,  &
-   !$acc                   nmindsrc, qtsrc, &
-   !$acc                   z_index_wavemaker, wavemaker_uvmean, wavemaker_nmd, wavemaker_nmu, wavemaker_ndm, wavemaker_num )
    !
    ! First discharges (don't do this parallel, as it's probably not worth it)
    !
    if (nsrcdrn > 0) then
       ! 
-      !$acc loop
       do isrc = 1, nsrcdrn
          ! 
          nm = nmindsrc(isrc)
@@ -105,11 +98,7 @@ contains
       ! 
    endif
    !
-   !$omp parallel &
-   !$omp private ( nm,dvol,nmd,nmu,ndm,num,qnmd,qnmu,qndm,qnum,iwm)
-   !$omp do schedule ( dynamic, 256 )
-   !$acc loop gang vector
-   do nm = 1, np
+   do concurrent (nm = 1 : np) local( dvol,nmd,nmu,ndm,num,qnmd,qnmu,qndm,qnum,iwm)
       ! 
       if (kcs(nm) == 1) then ! Regular point
          !
@@ -255,9 +244,6 @@ contains
       endif
       !
    enddo
-   !$omp end do
-   !$omp end parallel
-   !$acc end parallel
    !         
    end subroutine
 
@@ -310,9 +296,10 @@ contains
    !
    if (nsrcdrn > 0) then
       !
-      !$acc serial present( z_volume, nmindsrc, qtsrc )
-      do isrc = 1, nsrcdrn
+      ! Changed serial loops to parallel loops with independent clause. Gives identical results as long as only a single sink/source point appears in each grid cell
+      do concurrent (isrc = 1: nsrcdrn)
          !
+         ! Consider to add a check if any of the nm's are identical as the loop would only work in serial (current code produces wrong results). If check is positive either terminate (decide that SFINCS can handle only one source/sink point per grid cell) or fall back to serial loop
          nm = nmindsrc(isrc)
          !
          if ((z_volume(nm) >= 0) .or. ((qtsrc(isrc)<0.0) .and. (z_volume(nm) >= 0))) then
@@ -320,21 +307,11 @@ contains
          endif
          !
       enddo
-      !$acc end serial
+      !End new parallel loop
       !
    endif
    !
-   !$omp parallel &
-   !$omp private ( dvol,dzsdt,nmd,nmu,ndm,num,a,iuv,facint,dzvol,ind,iwm,qnmd,qnmu,qndm,qnum,dv,zs00,zs11 )
-   !$omp do schedule ( dynamic, 256 )
-   !$acc parallel present( kcs, zs, zs0, zb, z_volume, zsmax, zsm, maxzsm, zsderv, &
-   !$acc                   subgrid_z_zmin,  subgrid_z_zmax, subgrid_z_dep, subgrid_z_volmax, &
-   !$acc                   netprcp, prcp, q, qext, z_flags_iref, uv_flags_iref, &
-   !$acc                   z_index_uv_md, z_index_uv_nd, z_index_uv_mu, z_index_uv_nu, &
-   !$acc                   dxm, dxrm, dyrm, dxminv, dxrinv, dyrinv, cell_area_m2, cell_area, &   
-   !$acc                   z_index_wavemaker, wavemaker_uvmean, wavemaker_nmd, wavemaker_nmu, wavemaker_ndm, wavemaker_num, storage_volume)
-   !$acc loop gang vector
-   do nm = 1, np
+   do concurrent (nm = 1: np) local(dvol,dzsdt,nmd,nmu,ndm,num,a,iuv,facint,dzvol,ind,iwm,qnmd,qnmu,qndm,qnum,dv,zs00,zs11)
       !
       ! And now water level changes due to horizontal fluxes
       !
@@ -616,10 +593,6 @@ contains
       endif
       !
    enddo
-   !$omp end do
-   !$omp end parallel
-   !         
-   !$acc end parallel
    !         
    end subroutine
    
@@ -643,13 +616,7 @@ contains
    real*4           :: qz
    real*4           :: uvz      
    !
-   !$omp parallel &
-   !$omp private ( nmd, nmu, ndm, num, quz, qvz, qz, uvz )
-   !$omp do schedule ( dynamic, 256 )
-   !$acc parallel present( kcs, zs, zb, subgrid_z_zmin, q, uv, vmax, qmax, twet, &
-   !$acc                   z_index_uv_md, z_index_uv_nd, z_index_uv_mu, z_index_uv_nu )
-   !$acc loop gang vector 
-   do nm = 1, np
+   do concurrent (nm = 1: np) local( nmd, nmu, ndm, num, quz, qvz, qz, uvz )
       !
       ! And now water level changes due to horizontal fluxes
       !
@@ -713,9 +680,6 @@ contains
          !
       endif   
    enddo   
-   !$omp end do
-   !$omp end parallel
-   !$acc end parallel
    !       
    end subroutine
    

@@ -221,18 +221,13 @@ contains
              dstmin = 1.0e6
              !
              ! Calculate the distance for each coordinate
-             !$omp parallel &
-             !$omp private ( ip, dst )
-             !$omp do
              do ip = 1, np
                  !
                  dst = sqrt((z_xz(ip) - xsw)**2 + (z_yz(ip) - ysw)**2)
                  !
                  distances(ip) = dst
                  !
-             enddo
-             !$omp end do         
-             !$omp end parallel             
+             enddo            
              !
              ! Find the minimum distance
              min_distance = minval(distances)         

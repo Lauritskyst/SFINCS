@@ -30,11 +30,6 @@ contains
    !
    ! Update fluxes
    !
-   !$omp parallel &
-   !$omp private ( ip, itracer, icuv, nm, nmu) &
-   !$omp do schedule ( dynamic, 256 )
-   !$acc kernels, present( kcuv, q, trconc, trflux, uv_index_z_nm, uv_index_z_nmu )
-   !$acc loop independent
    do ip = 1, npuv
       !
       if (kcuv(ip) == 1) then
@@ -60,20 +55,12 @@ contains
          !
 	  endif
    enddo	  
-   !$omp end do
-   !$omp end parallel
-   !$acc end kernels
    !
    if (ncuv > 0) then
       !
       ! Loop through combined uv points and determine average uv and q
       ! The combined q and uv values are used in the continuity equation and in the netcdf output
       !
-      !$omp parallel &
-      !$omp private ( icuv, itracer )
-      !$omp do
-      !$acc kernels, present( trflux, cuv_index_uv, cuv_index_uv1, cuv_index_uv2 )
-      !$acc loop independent
       do icuv = 1, ncuv
          do itracer = 1, ntracer
             !
@@ -83,9 +70,6 @@ contains
             !
          enddo
       enddo	  
-      !$acc end kernels
-      !$omp end do
-      !$omp end parallel
       !
    endif
    !

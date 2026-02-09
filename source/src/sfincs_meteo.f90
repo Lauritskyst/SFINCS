@@ -1208,15 +1208,6 @@ contains
       twfact  = (t - meteo_t0)/(meteo_t1 - meteo_t0)
       onemintwfact = 1.0 - twfact
       !
-      !$omp parallel &
-      !$omp private ( nm )
-      !$omp do
-      !$acc parallel, present( tauwu, tauwv,  tauwu0, tauwv0, tauwu1, tauwv1, &
-      !$acc                    windu, windv, windu0, windv0, windu1, windv1, windmax, &
-      !$acc                    patm, patm0, patm1, &
-      !$acc                    prcp, prcp0, prcp1, cumprcp, netprcp, &
-      !$acc                    zs, zb, z_volume )
-      !$acc loop gang vector
       do nm = 1, np
          !
          if (wind) then
@@ -1268,9 +1259,6 @@ contains
          endif   
          !
       enddo   
-      !$omp end do
-      !$omp end parallel
-      !$acc end parallel
       !
       ! Apply spin-up factor
       !
@@ -1279,11 +1267,6 @@ contains
          smfac = (t - t0) / (tspinup - t0)
          oneminsmfac = 1.0 - smfac
          !
-         !$omp parallel &
-         !$omp private ( nm )
-         !$omp do
-         !$acc parallel, present( tauwu, tauwv, patm, prcp, netprcp, zs, zb, z_volume )
-         !$acc loop gang vector
          do nm = 1, np
             !
             if (wind) then
@@ -1319,9 +1302,6 @@ contains
             endif   
             !
          enddo   
-         !$omp end do
-         !$omp end parallel
-         !$acc end parallel
          !
       endif         
       !   
@@ -1329,14 +1309,11 @@ contains
          !
          ! Update atmospheric pressure at boundary points (patmb)
          !
-         !$acc parallel, present( patmb, nmindbnd, patm )
-         !$acc loop gang vector
          do ib = 1, ngbnd
             !
             patmb(ib) = patm(nmindbnd(ib))
             !
          enddo
-         !$acc end parallel
          !
          ! patmb is used at boundary points in the CPU part of update_boundary_conditions (should try to make this faster)
          !
@@ -1405,19 +1382,10 @@ contains
          twu = vmag**2 * cos(vdir) * rhoa * cd / rhow
          twv = vmag**2 * sin(vdir) * rhoa * cd / rhow
          !
-         !$omp parallel &
-         !$omp private ( nm ) &
-         !$omp shared ( tauwu,tauwv )
-         !$omp do
-         !$acc parallel, present( tauwu, tauwv )
-         !$acc loop gang vector
          do nm = 1, np
             tauwu(nm) = twu
             tauwv(nm) = twv
          enddo   
-         !$acc end parallel
-         !$omp end do
-         !$omp end parallel
          !
          itwndlast = itw - 1
          !
@@ -1462,11 +1430,6 @@ contains
    !
    ptmp = (tprcpv(itp - 1) * (1.0 - twfac) + tprcpv(itp) * twfac) / (1000*3600) ! rain in m/s
    !
-   !$omp parallel &
-   !$omp private ( nm )
-   !$omp do
-   !$acc parallel present( prcp, cumprcp, netprcp )
-   !$acc loop gang vector
    do nm = 1, np
       !
       prcp(nm)    = ptmp
@@ -1477,9 +1440,6 @@ contains
       endif   
       !
    enddo   
-   !$acc end parallel
-   !$omp end do
-   !$omp end parallel
    !
    itprcplast = itp - 1
    !
