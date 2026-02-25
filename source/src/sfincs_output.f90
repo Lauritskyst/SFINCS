@@ -113,19 +113,19 @@ module sfincs_output
    if (write_map .or. write_his .or. write_rst) then
       !
       !$acc update host(zs)
-      !$omp target update to (zs)
+      !$omp target update from (zs)
       !
       if (store_cumulative_precipitation) then
          !      
          !$acc update host(prcp)
-         !$omp target update to (prcp)
+         !$omp target update from (prcp)
          !
       endif   
       !
       if (store_velocity) then
          !      
          !$acc update host(uv)
-         !$omp target update to (uv)
+         !$omp target update from (uv)
          !
       endif   
       !
@@ -133,7 +133,7 @@ module sfincs_output
          !
          !$acc update host(q)
          !$acc update host(uvmean)
-         !$omp target update to (q , uvmean)
+         !$omp target update from (q , uvmean)
          !
       endif
       !
@@ -142,7 +142,7 @@ module sfincs_output
          !$acc update host(windu)
          !$acc update host(windv)
          !$acc update host(patm)
-         !$omp target update to (windu,windv,patm)
+         !$omp target update from (windu,windv,patm)
          !
       endif
       !      
@@ -219,19 +219,19 @@ module sfincs_output
       if (store_maximum_waterlevel) then
          zsmax = -999.0 ! Set zsmax back to a small value
          !$acc update device(zsmax)
-         !$omp target update from (zsmax)
+         !$omp target update to (zsmax)
       endif
       !
       if (store_maximum_velocity) then
          vmax = -999.0 ! Set vmax back to a small value
          !$acc update device(vmax)
-         !$omp target update from (vmax)
+         !$omp target update to (vmax)
       endif
       !
       if (store_maximum_flux) then
          qmax = -999.0 ! Set qmax back to a small value
          !$acc update device(qmax)
-         !$omp target update from (qmax)
+         !$omp target update to (qmax)
       endif      
       !      
 !      if (precip .and. store_cumulative_precipitation) then
@@ -242,13 +242,13 @@ module sfincs_output
       if (store_twet) then
          twet = 0.0 ! Set twet back to 0.0
          !$acc update device(twet)
-         !$omp target update from (twet)
+         !$omp target update to (twet)
       endif
       !      
       if (store_t_zsmax) then
          t_zsmax = -999.0 ! Set t_zsmax back to a small value
          !$acc update device(t_zsmax)
-         !$omp target update from (t_zsmax)
+         !$omp target update to (t_zsmax)
       endif
    endif
    !
