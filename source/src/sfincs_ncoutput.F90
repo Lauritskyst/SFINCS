@@ -3136,6 +3136,7 @@ contains
    if (nrcrosssections>0) then
       !
       !$acc update host(q)
+      !$omp target update from (q)
       !      
       ! Get fluxes through cross sections
       !
@@ -3158,8 +3159,9 @@ contains
    if (ndrn>0) then
       !
       !$acc update host(qtsrc)
-      ! Get fluxes through drainage structure             
-      !
+      !$omp target update from (qtsrc)
+         ! Get fluxes through drainage structure             
+         !
       idrn = 0
       do iobs = nsrc + 1, nsrcdrn, 2 !TL: as in sfincs_output.f90
          idrn = idrn + 1
