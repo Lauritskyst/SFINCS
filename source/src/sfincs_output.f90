@@ -113,19 +113,19 @@ module sfincs_output
    if (write_map .or. write_his .or. write_rst) then
       !
       !$acc update host(zs)
-      !$omp target update from (zs)
+      !$omp target update to (zs)
       !
       if (store_cumulative_precipitation) then
          !      
          !$acc update host(prcp)
-         !$omp target update from (prcp)
+         !$omp target update to (prcp)
          !
       endif   
       !
       if (store_velocity) then
          !      
          !$acc update host(uv)
-         !$omp target update from (uv)
+         !$omp target update to (uv)
          !
       endif   
       !
@@ -133,7 +133,7 @@ module sfincs_output
          !
          !$acc update host(q)
          !$acc update host(uvmean)
-         !$omp target update from (q , uvmean)
+         !$omp target update to (q , uvmean)
          !
       endif
       !
@@ -142,7 +142,7 @@ module sfincs_output
          !$acc update host(windu)
          !$acc update host(windv)
          !$acc update host(patm)
-         !$omp target update from (windu,windv,patm)
+         !$omp target update to (windu,windv,patm)
          !
       endif
       !      
