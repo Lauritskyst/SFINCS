@@ -80,7 +80,7 @@ contains
    !
    if (nsrcdrn > 0) then
       ! 
-      do isrc = 1, nsrcdrn
+      do concurrent (isrc = 1: nsrcdrn)
          ! 
          nm = nmindsrc(isrc)
          ! 
