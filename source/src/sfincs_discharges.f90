@@ -356,10 +356,7 @@ contains
    !
    if (ndrn > 0) then
       !
-      ! Changed serial loops to parallel loops with independent clause. Gives identical results as long as only a single sink/source point appears in each grid cell
-      !$acc parallel present( z_volume, zs, zb, nmindsrc, qtsrc, drainage_type, drainage_params )
-      !$acc loop independent gang vector
-      do idrn = 1, ndrn
+      do concurrent (idrn = 1: ndrn)
          !
          jin  = nsrc + idrn * 2 - 1
          jout = nsrc + idrn * 2
@@ -638,7 +635,6 @@ contains
          endif
          !
       enddo
-      !$acc end parallel
       !
    endif
    !
