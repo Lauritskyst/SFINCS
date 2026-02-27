@@ -18,9 +18,9 @@ contains
    real*4, dimension(:),     allocatable :: xsnk
    real*4, dimension(:),     allocatable :: ysnk
    !
-   real*4 dummy, xsnk_tmp, ysnk_tmp, xsrc_tmp, ysrc_tmp
+   real*4 :: dummy, xsnk_tmp, ysnk_tmp, xsrc_tmp, ysrc_tmp
    !
-   integer isrc, itsrc, idrn, nm, m, n, stat, j, iref, nmq, npars
+   integer :: isrc, itsrc, idrn, nm, m, n, stat, j, iref, nmq, npars
    !
    logical :: ok
    !
@@ -332,7 +332,8 @@ contains
    real*4           :: dzds, frac, wdt, zsill, zmin, zmax, mng, hgate, dfrac, tcls, topen, tclose
    integer          :: idir
    !
-   integer isrc, itsrc, idrn, jin, jout, nmin, nmout
+   integer          :: isrc, itsrc, idrn, jin, jout, nmin, nmout
+
    !
    call system_clock(count0, count_rate, count_max)
    !
@@ -350,13 +351,13 @@ contains
          endif
       enddo
       !
-      !$acc update device(qtsrc)
+      !$omp target update to (qtsrc)
       !
    endif
    !
    if (ndrn > 0) then
       !
-      do concurrent (idrn = 1: ndrn)
+      do concurrent (idrn = 1: ndrn) local(jout,jin,nmin,nmout,qq,dzds, frac, wdt, zsill, zmin, zmax, mng, hgate, dfrac, tcls, topen, tclose)
          !
          jin  = nsrc + idrn * 2 - 1
          jout = nsrc + idrn * 2
