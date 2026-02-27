@@ -80,7 +80,7 @@ contains
    !
    if (nsrcdrn > 0) then
       ! 
-      do concurrent (isrc = 1: nsrcdrn)
+      do concurrent (isrc = 1: nsrcdrn) local(nm)
          ! 
          nm = nmindsrc(isrc)
          ! 
@@ -297,13 +297,15 @@ contains
    if (nsrcdrn > 0) then
       !
       ! Changed serial loops to parallel loops with independent clause. Gives identical results as long as only a single sink/source point appears in each grid cell
-      do concurrent (isrc = 1: nsrcdrn)
+      do concurrent (isrc = 1: nsrcdrn) local(nm)
          !
          ! Consider to add a check if any of the nm's are identical as the loop would only work in serial (current code produces wrong results). If check is positive either terminate (decide that SFINCS can handle only one source/sink point per grid cell) or fall back to serial loop
          nm = nmindsrc(isrc)
          !
-         if ((z_volume(nm) >= 0) .or. ((qtsrc(isrc)<0.0) .and. (z_volume(nm) >= 0))) then
-            z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt
+         if (nm > 0) then
+             if ((z_volume(nm) >= 0) .or. ((qtsrc(isrc)<0.0) .and. (z_volume(nm) >= 0))) then
+                z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt
+             endif
          endif
          !
       enddo
