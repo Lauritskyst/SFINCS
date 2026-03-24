@@ -95,6 +95,7 @@ contains
    call system_clock(count0, count_rate, count_max)
    !
    min_dt = dtmax
+   !$omp target update to (min_dt)
    !
    ! For some reason, it is necessary to set num_gangs here! Without, the program launches only 1 gang, and everything becomes VERY slow!
    !
@@ -690,6 +691,7 @@ contains
          !
       endif
    enddo   
+   !$omp target update from (min_dt)
    !
    if (ncuv > 0) then
       !
