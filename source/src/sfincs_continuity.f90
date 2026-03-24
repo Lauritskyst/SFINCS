@@ -302,7 +302,7 @@ contains
          ! Consider to add a check if any of the nm's are identical as the loop would only work in serial (current code produces wrong results). If check is positive either terminate (decide that SFINCS can handle only one source/sink point per grid cell) or fall back to serial loop
          nm = nmindsrc(isrc)
          !
-         if (nm > 0) then
+         if (nm > 0) then !Had to add this check to run on AMD GPU - seems as at least one nm from nmindsrc(isrc) still has value 0 from when it was initiated.
              if ((z_volume(nm) >= 0) .or. ((qtsrc(isrc)<0.0) .and. (z_volume(nm) >= 0))) then
                 z_volume(nm) = z_volume(nm) + qtsrc(isrc) * dt
              endif
