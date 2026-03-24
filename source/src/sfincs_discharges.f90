@@ -351,13 +351,13 @@ contains
          endif
       enddo
       !
-      !$omp target update to (qtsrc)
+      !$omp target update to (qtsrc(1:nsrc))
       !
    endif
    !
    if (ndrn > 0) then
       !
-      do concurrent (idrn = 1: ndrn) local(jout,jin,nmin,nmout,qq,dzds, frac, wdt, zsill, zmin, zmax, mng, hgate, dfrac, tcls, topen, tclose)
+      do concurrent (idrn = 1: ndrn) local(jout,jin,nmin,nmout,qq,dzds, frac, wdt, zsill, zmin, zmax, mng, hgate, dfrac, tcls, topen, tclose,qq0)
          !
          jin  = nsrc + idrn * 2 - 1
          jout = nsrc + idrn * 2
