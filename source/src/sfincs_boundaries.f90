@@ -742,7 +742,7 @@ contains
    !
    implicit none
    !
-   integer ib, nmb, ibdr
+   integer ib, nmb, ibdr, i_omp
    !
    real*8                            :: t
    real                              :: dt
@@ -874,7 +874,15 @@ contains
          zsb(ib) = zst
          zsb0(ib) = zst
          !
-      elseif (kcs(nmb) == 6) then
+      endif
+      !
+   enddo
+   !
+   !Neumann boundaries are done on the gpu
+   do concurrent (ib = 1:ngbnd)
+      !
+      nmb = nmindbnd(ib)
+      if (kcs(nmb) == 6) then
          !
          ! Lateral coastal (Neumann) boundary
          !
@@ -882,9 +890,8 @@ contains
          ! No need to set zsb and zsb0, as flux for this type of boundary is solved in sfincs_momentum.f90.
          ! Lateral boundary u/v points have kcuv=6. They are skipped in update_boundary_fluxes.
          !
-         ! TODO: OPENACC!!!!
-         !
-         zs(nmb) = zs(nmi_gbp(ib)) ! nm index of internal point. Technically there can be more than one internal point. This always uses the last point that was found.
+         i_omp = nmi_gbp(ib)
+         zs(nmb) = zs(i_omp) ! nm index of internal point. Technically there can be more than one internal point. This always uses the last point that was found.
          !         
       endif
       !
