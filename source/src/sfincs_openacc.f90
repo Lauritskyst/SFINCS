@@ -42,6 +42,7 @@ contains
    !$omp map(to: g, huthresh, advlim, uvlim, slopelim, rhow, fcorio, nuviscfac) &
    !$omp map(to: subgrid_nlevels, dx, dy, btfilter, btrelax, wmtfilter) &
    !$omp map(to: np, npuv, ncuv, nsrcdrn, ndrn, nsrc, nkcuv2,structure_relax) 
+   !$omp map(to: nmi_gbp)
    !   
    end subroutine
    ! 
