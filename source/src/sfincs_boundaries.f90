@@ -459,7 +459,6 @@ contains
 
 
    subroutine find_boundary_indices()
-   logical       :: neumann_true
    !
    use sfincs_data
    !
