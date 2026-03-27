@@ -459,6 +459,7 @@ contains
 
 
    subroutine find_boundary_indices()
+   logical       :: neumann_true
    !
    use sfincs_data
    !
@@ -651,6 +652,10 @@ contains
       endif
       !
    enddo
+   neumann_true = .false.
+   if (any(kcs == 6)) then
+      neumann_true = .true.
+   endif
    !
    end subroutine
 
@@ -879,7 +884,7 @@ contains
    enddo
    !
    !Neumann boundaries are done on the gpu
-   if (any(kcs == 6)) then !This check should be done faster by setting true/false condition before this subroutine
+   if (neumann_true) then
       do concurrent (ib = 1:ngbnd)
          !
          nmb = nmindbnd(ib)
