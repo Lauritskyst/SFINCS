@@ -879,7 +879,7 @@ contains
    enddo
    !
    !Neumann boundaries are done on the gpu
-   if 6 in kcs:
+   if (any(kcs == 6) then
       do concurrent (ib = 1:ngbnd)
          !
          nmb = nmindbnd(ib)
