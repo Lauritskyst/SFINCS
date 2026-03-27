@@ -879,23 +879,25 @@ contains
    enddo
    !
    !Neumann boundaries are done on the gpu
-   do concurrent (ib = 1:ngbnd)
-      !
-      nmb = nmindbnd(ib)
-      if (kcs(nmb) == 6) then
+   if 6 in kcs:
+      do concurrent (ib = 1:ngbnd)
          !
-         ! Lateral coastal (Neumann) boundary
+         nmb = nmindbnd(ib)
+         if (kcs(nmb) == 6) then
+            !
+            ! Lateral coastal (Neumann) boundary
+            !
+            ! Set water level at boundary point equal to water level inside model.
+            ! No need to set zsb and zsb0, as flux for this type of boundary is solved in sfincs_momentum.f90.
+            ! Lateral boundary u/v points have kcuv=6. They are skipped in update_boundary_fluxes.
+            !
+            i_omp = nmi_gbp(ib)
+            zs(nmb) = zs(i_omp) ! nm index of internal point. Technically there can be more than one internal point. This always uses the last point that was found.
+            !         
+         endif
          !
-         ! Set water level at boundary point equal to water level inside model.
-         ! No need to set zsb and zsb0, as flux for this type of boundary is solved in sfincs_momentum.f90.
-         ! Lateral boundary u/v points have kcuv=6. They are skipped in update_boundary_fluxes.
-         !
-         i_omp = nmi_gbp(ib)
-         zs(nmb) = zs(i_omp) ! nm index of internal point. Technically there can be more than one internal point. This always uses the last point that was found.
-         !         
-      endif
-      !
-   enddo
+      enddo
+   endif
    !
    end subroutine
 
