@@ -168,14 +168,14 @@ contains
       !
    enddo
    !
-   meteo3d = .false.
-   wind = .false.
-   store_meteo = .false.
-   store_wind = .false.
-   store_wind_max = .false.
+   !meteo3d = .false.
+   !wind = .false.
+   !store_meteo = .false.
+   !store_wind = .false.
+   !store_wind_max = .false.
    precip = .false.
    patmos = .false.
-   snapwave = .false.
+   !snapwave = .false.
    infiltration = .false.
    store_velocity = .false.
    store_maximum_velocity = .false.

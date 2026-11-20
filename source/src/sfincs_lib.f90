@@ -154,13 +154,13 @@ module sfincs_lib
    call write_log('Reading input file ...', 0) 
    call read_sfincs_input()     ! Reads sfincs.inp
    !
-   if (.not. bathtub) then
+   !if (.not. bathtub) then !! changed by lasta
       !
       call write_log('Reading meteo data ...', 0)
       !
       call read_meteo_data()       ! Reads meteo data (amu, amv, spw file etc.)
       !
-   endif   
+   !endif   
    !
    call write_log('Preparing domain ...', 0)
    !
@@ -492,13 +492,6 @@ module sfincs_lib
       !
       call update_boundaries(t, dt)
       !
-      if (snapwave .and. update_waves) then
-         !
-         ! Update wave fields from SnapWave coupling (this happens at intervals of dtwave)
-         !
-         call update_wave_field(t)
-         !
-      endif
       !
       if (bathtub) then
          !
@@ -551,6 +544,14 @@ module sfincs_lib
          call update_continuity(t, dt)
          !
       endif   
+      !
+      if (snapwave .and. update_waves) then !!moved to after bathtub
+         !
+         ! Update wave fields from SnapWave coupling (this happens at intervals of dtwave)
+         !
+         call update_wave_field(t)
+         !
+      endif
       !
       ! OUTPUT
       !      
